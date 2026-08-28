@@ -1,16 +1,421 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Github Page demo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="index.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thinking on Shots: Consistent Multi-Shot Video Editing with Agentic Reasoning</title>
+<style>
+  :root{
+    --bg:#0b0d12;
+    --bg-soft:#12151d;
+    --card:#161a24;
+    --card-2:#1b2030;
+    --border:#262c3a;
+    --text:#e8ebf2;
+    --muted:#98a1b3;
+    --accent:#5b8cff;
+    --accent-2:#8b6bff;
+    --ours:#43d17f;
+    --radius:16px;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -200px,#1a2136 0%,var(--bg) 60%);
+    color:var(--text);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;}
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    padding:70px 22px 46px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+  }
+  .venue{
+    display:inline-block;
+    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);
+    background:rgba(91,140,255,.10);
+    border:1px solid rgba(91,140,255,.35);
+    padding:5px 14px;border-radius:999px;margin-bottom:22px;font-weight:600;
+  }
+  h1.title{
+    font-size:clamp(26px,4.4vw,46px);
+    line-height:1.18;margin:0 auto 10px;max-width:1000px;font-weight:800;
+    background:linear-gradient(90deg,#eef2ff,#b9c6ff 55%,#c9b8ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .subtitle{color:var(--muted);font-size:17px;margin:6px auto 26px;max-width:760px;}
+  .authors{max-width:900px;margin:0 auto 6px;font-size:17px;}
+  .authors b{color:#fff;}
+  .authors sup{color:var(--accent);font-weight:700;}
+  .affil{color:var(--muted);font-size:15px;margin-bottom:26px;}
+  .affil sup{color:var(--accent);}
+
+  .badges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px;}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:10px 18px;border-radius:12px;font-weight:600;font-size:15px;
+    background:var(--card-2);border:1px solid var(--border);color:var(--text);
+    transition:.18s transform,.18s border-color,.18s background;
+  }
+  .badge:hover{transform:translateY(-2px);border-color:var(--accent);text-decoration:none;background:#20263a;}
+  .badge.disabled{opacity:.55;cursor:not-allowed;}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+
+  /* ---------- Sections ---------- */
+  section{padding:56px 0;border-bottom:1px solid var(--border);}
+  .eyebrow{
+    text-align:center;color:var(--accent);font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;font-size:13px;margin-bottom:8px;
+  }
+  h2{
+    text-align:center;font-size:clamp(22px,3vw,32px);margin:0 0 14px;font-weight:800;
+  }
+  .lead{max-width:820px;margin:0 auto 12px;color:var(--muted);text-align:center;font-size:16.5px;}
+
+  /* abstract */
+  .abstract{
+    max-width:900px;margin:22px auto 0;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);padding:26px 30px;
+    color:#cdd4e2;font-size:16px;text-align:justify;
+  }
+
+  /* challenge cards */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px 22px;transition:.2s transform,.2s border-color;
+  }
+  .card:hover{transform:translateY(-4px);border-color:var(--accent);}
+  .card .tag{font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--accent);}
+  .card h3{margin:8px 0 8px;font-size:19px;}
+  .card p{margin:0;color:var(--muted);font-size:15px;}
+  .card.alt .tag{color:var(--accent-2);}
+  .card.alt:hover{border-color:var(--accent-2);}
+
+  /* figures */
+  figure{margin:26px 0 0;text-align:center;}
+  figure img{
+    max-width:100%;border-radius:14px;border:1px solid var(--border);
+    box-shadow:0 24px 60px rgba(0,0,0,.4);background:#fff;
+  }
+  figcaption{color:var(--muted);font-size:14.5px;margin-top:12px;max-width:900px;margin-left:auto;margin-right:auto;}
+
+  /* mechanism 2-col */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;}
+
+  /* ---------- Video comparison ---------- */
+  .sample{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px 24px 28px;margin-top:26px;
+  }
+  .sample-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+  .sample-idx{
+    flex:none;width:44px;height:44px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+  }
+  .sample-head .instr{font-size:15px;color:#cdd4e2;}
+  .sample-head .instr .k{color:var(--accent);font-weight:700;}
+  .lang-toggle{margin-left:auto;flex:none;}
+  .lang-toggle button{
+    background:var(--card-2);border:1px solid var(--border);color:var(--muted);
+    padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;
+  }
+  .lang-toggle button.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .vids{display:flex;flex-direction:column;gap:20px;}
+  /* input on top, centered and enlarged */
+  .vinput{width:100%;max-width:62%;margin:0 auto;}
+  /* four methods in a 2x2 grid */
+  .vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .vcell{background:var(--card-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .vcell.ours{border-color:var(--ours);box-shadow:0 0 0 1px var(--ours);}
+  .vcell video{width:100%;display:block;background:#000;aspect-ratio:16/9;object-fit:cover;}
+  .vlabel{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 6px;font-size:13.5px;font-weight:700;color:var(--muted);text-align:center;
+  }
+  .vcell.ours .vlabel{color:var(--ours);}
+  .vcell.input .vlabel{color:var(--text);}
+  .pill{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(67,209,127,.15);color:var(--ours);}
+
+  .hint{text-align:center;color:var(--muted);font-size:14px;margin-top:18px;}
+
+  /* citation */
+  pre.cite{
+    max-width:900px;margin:22px auto 0;background:#0d1017;border:1px solid var(--border);
+    border-radius:14px;padding:20px 22px;overflow:auto;color:#cbd3e6;font-size:13.5px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;line-height:1.6;text-align:left;
+  }
+
+  footer{padding:40px 22px;text-align:center;color:var(--muted);font-size:14px;}
+
+  @media(max-width:900px){
+    .grid3,.grid2{grid-template-columns:1fr;}
+    .vinput{max-width:100%;}
+    .vgrid{grid-template-columns:1fr;}
+    .sample-head{flex-wrap:wrap;}
+    .lang-toggle{margin-left:0;}
+  }
+</style>
 </head>
 <body>
-    <div id="main-content">
 
+<header class="hero">
+  <div class="venue">Multi-Instruction Multi-Shot Long-Video Editing</div>
+  <h1 class="title">Thinking on Shots: Consistent Multi-Shot Video Editing with Agentic Reasoning<sup>&ast;</sup></h1>
+  <p class="subtitle">An agentic framework that edits real-world multi-shot long videos from a single natural-language instruction &mdash; preserving identity, background, and camera motion.</p>
+
+  <div class="authors">
+    <b>Chenyang Wu</b><sup>1,&dagger;</sup>, <b>Fuchen Long</b><sup>2,&dagger;</sup>, Binyuan Huang<sup>2</sup>, Xinlong Sun<sup>2,&Dagger;</sup>, Xi Chen<sup>2</sup>, Chun-Le Guo<sup>1</sup>, Chongyi Li<sup>1,&sect;</sup>
+  </div>
+  <div class="affil"><sup>1</sup>VCIP, CS, Nankai University &nbsp;&middot;&nbsp; <sup>2</sup>Smart Creation Platform Department, Online Video BU, Tencent</div>
+  <div class="affil"><sup>&ast;</sup>Work done during the Tencent Qingyun Program internship.</div>
+  <div class="affil"><sup>&dagger;</sup>These authors contributed equally. &nbsp;&middot;&nbsp; <sup>&Dagger;</sup>Project Leader. &nbsp;&middot;&nbsp; <sup>&sect;</sup>Corresponding Author.</div>
+
+  <div class="badges">
+    <a class="badge" href="https://wucy0519.github.io/MMLVE/" target="_blank"><span class="dot"></span>Project Page</a>
+    <a class="badge" href="https://arxiv.org/abs/2608.26809" target="_blank">&#128220; arXiv</a>
+    <a class="badge" href="https://huggingface.co/datasets/wcy1234567/MMLVE-Bench" target="_blank">&#129303; MMLVE-Bench</a>
+    <a class="badge" href="./README.md" target="_blank">&lt;/&gt; Code &amp; README</a>
+  </div>
+</header>
+
+<!-- Abstract -->
+<section id="abstract">
+  <div class="wrap">
+    <div class="eyebrow">Abstract</div>
+    <h2>Editing Long Videos, One Instruction at a Time</h2>
+    <div class="abstract">
+      While generative AI has significantly advanced video editing, existing methods primarily focus on single-shot or short video clips. Editing long videos with multiple instructions remains a formidable challenge: naive chunking strategies (e.g., fixed-duration segmentation) often lead to <b>entity fragmentation</b>, severe <b>editing hallucinations</b>, and disrupted <b>temporal continuity</b>. To bridge this gap, we introduce the <b>Multi-Instruction Multi-Shot Long-Video Editing (MMLVE)</b> task, structured around three core objectives: Cross-Shot Editing Consistency (CSEC), Multi-Instruction Decoupling (MID), and Zero-Destruction on Spatiotemporal Structure (ZDSS). We propose an agentic editing framework that leverages the synergy of <b>LLMs</b> and <b>VLMs</b> for shot-level video decoupling and precise instruction parsing. We further construct <b>MMLVE-Bench</b>, a dataset characterized by complex real-world spatiotemporal dynamics, high-density heterogeneous instructions, and sparse, random entity distributions. Extensive experiments demonstrate that our <b>MMLVE-Agent</b> outperforms existing closed-source SOTA approaches (e.g., Seedance 2.0), eliminating editing hallucinations, preserving cross-shot editing consistency, and attaining seamless spatiotemporal transitions.
     </div>
+  </div>
+</section>
+
+<!-- Challenges -->
+<section id="task">
+  <div class="wrap">
+    <div class="eyebrow">The Task</div>
+    <h2>Three Core Challenges</h2>
+    <p class="lead">MMLVE is defined around three objectives that naive chunking pipelines fundamentally fail to satisfy.</p>
+    <div class="grid3">
+      <div class="card">
+        <div class="tag">CSEC</div>
+        <h3>Cross-Shot Editing Consistency</h3>
+        <p>Keep the edited entity's visual identity consistent across every shot &mdash; no cross-shot &ldquo;amnesia&rdquo; or identity drift.</p>
+      </div>
+      <div class="card">
+        <div class="tag">MID</div>
+        <h3>Multi-Instruction Decoupling</h3>
+        <p>Execute diverse, high-density instructions independently, without mutual interference or attribute leakage.</p>
+      </div>
+      <div class="card">
+        <div class="tag">ZDSS</div>
+        <h3>Zero-Destruction on Spatiotemporal Structure</h3>
+        <p>Leave un-targeted regions, backgrounds, and camera motion completely untouched.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Framework -->
+<section id="framework">
+  <div class="wrap">
+    <div class="eyebrow">Method</div>
+    <h2>MMLVE-Agent Framework</h2>
+    <p class="lead">A heterogeneous multi-agent pipeline: shot boundary detection + LLM instruction parsing &rarr; per-shot VLM analysis &rarr; Global Memory Card making &rarr; reference-guided video editing &amp; propagation &rarr; assembly.</p>
+    <figure>
+      <img src="assets/framework.png" alt="MMLVE-Agent framework">
+      <figcaption>Overall framework of MMLVE-Agent. LLM and VLM agents collaborate to decouple shots and instructions, build a global visual anchor, and propagate consistent edits across the whole video.</figcaption>
+    </figure>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="tag">Mechanism 1</div>
+        <h3>Global Memory Card</h3>
+        <p>The top-<i>k</i> (k=6) highest-confidence keyframes of the target entity are aggregated into a reference grid and synthesized into a canonical reference image &mdash; a global visual anchor that guarantees CSEC &amp; MID across arbitrary physical shots.</p>
+      </div>
+      <div class="card alt">
+        <div class="tag">Mechanism 2</div>
+        <h3>Pos-Neg Editing Feedback (P-NEF)</h3>
+        <p>A VLM evaluator emits <b>both</b> a Negative Prompt (to correct errors) and a Positive Prompt (to balance the model's attention), enabling autonomous self-correction and monotonic improvement in generation quality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Qualitative image results -->
+<section id="results">
+  <div class="wrap">
+    <div class="eyebrow">Results</div>
+    <h2>Qualitative Showcase</h2>
+    <p class="lead">Editing results of MMLVE-Agent on complex multi-shot long videos.</p>
+    <figure>
+      <img src="assets/case_show.png" alt="MMLVE-Agent case showcase">
+    </figure>
+
+    <p class="lead" style="margin-top:40px;">Comparison against baselines. Only MMLVE-Agent simultaneously achieves CSEC, MID, and ZDSS; baselines suffer from cross-shot amnesia, identity morphing, and destruction of un-targeted content.</p>
+    <figure>
+      <img src="assets/compare_1.png" alt="Comparison with baselines (1)">
+    </figure>
+    <figure>
+      <img src="assets/compare_2.png" alt="Comparison with baselines (2)">
+    </figure>
+  </div>
+</section>
+
+<!-- Video comparisons -->
+<section id="videos">
+  <div class="wrap">
+    <div class="eyebrow">Video Results</div>
+    <h2>Side-by-Side Video Comparison</h2>
+    <p class="lead">Each row shows the original input and the edited output of four methods on the same multi-shot long video. <b style="color:var(--ours)">MMLVE-Agent (Ours)</b> preserves consistency where baselines fail.</p>
+
+    <!-- Sample 009 -->
+    <div class="sample" id="s009">
+      <div class="sample-head">
+        <div class="sample-idx">01</div>
+        <div class="instr" data-lang-container>
+          <span data-lang="en">
+            <span class="k">Instruction:</span> Change the blue frame of the round wall clock to red and make it square; remove the bearded young man in the white T-shirt sitting on the far left; and put a black baseball cap on the human skeleton model.
+          </span>
+          <span data-lang="cn" style="display:none;">
+            <span class="k">编辑指令：</span>把挂钟的蓝色外框改成红色并改为正方形；删除坐在最左侧、穿白色短袖、留有胡须的年轻男子；给人体骨骼模型戴上一顶黑色棒球帽。
+          </span>
+        </div>
+        <div class="lang-toggle">
+          <button class="active" data-lang-btn="en">EN</button>
+          <button data-lang-btn="cn">中</button>
+        </div>
+      </div>
+      <div class="vids">
+        <div class="vinput">
+          <div class="vcell input">
+            <video src="assets/video_results/input/sub_009.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Input</div>
+          </div>
+        </div>
+        <div class="vgrid">
+          <div class="vcell ours">
+            <video src="assets/video_results/MMLVE_Agent/sub_009.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">MMLVE-Agent <span class="pill">OURS</span></div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/seedance2/sub_009.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Seedance 2.0</div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/klingo3/sub_009.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Kling o3</div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/happyhorse/sub_009.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">HappyHorse 1.0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample 010 -->
+    <div class="sample" id="s010">
+      <div class="sample-head">
+        <div class="sample-idx">02</div>
+        <div class="instr" data-lang-container>
+          <span data-lang="en">
+            <span class="k">Instruction:</span> Add a red Christmas hat to the walking skeleton model; change the white 3D motion-capture models on the two monitors to green alien models; and change the young man's dark blue jacket into a red-and-black plaid shirt.
+          </span>
+          <span data-lang="cn" style="display:none;">
+            <span class="k">编辑指令：</span>给走动的骨骼模型头顶添加一顶红色圣诞帽；把两台显示器上的白色三维人体模型改成绿色外星人模型；把桌前看剧本的年轻男子的深蓝色夹克改为红黑相间的格子衬衫。
+          </span>
+        </div>
+        <div class="lang-toggle">
+          <button class="active" data-lang-btn="en">EN</button>
+          <button data-lang-btn="cn">中</button>
+        </div>
+      </div>
+      <div class="vids">
+        <div class="vinput">
+          <div class="vcell input">
+            <video src="assets/video_results/input/sub_010.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Input</div>
+          </div>
+        </div>
+        <div class="vgrid">
+          <div class="vcell ours">
+            <video src="assets/video_results/MMLVE_Agent/sub_010.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">MMLVE-Agent <span class="pill">OURS</span></div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/seedance2/sub_010.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Seedance 2.0</div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/klingo3/sub_010.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">Kling o3</div>
+          </div>
+          <div class="vcell">
+            <video src="assets/video_results/happyhorse/sub_010.mp4" muted loop playsinline controls preload="metadata"></video>
+            <div class="vlabel">HappyHorse 1.0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">Hover a video and use the controls to play. Videos loop automatically once started.</p>
+  </div>
+</section>
+
+<!-- Citation -->
+<section id="cite">
+  <div class="wrap">
+    <div class="eyebrow">Citation</div>
+    <h2>BibTeX</h2>
+    <pre class="cite">@article{wu2026thinking,
+  title   = {Thinking on Shots: Consistent Multi-Shot Video Editing with Agentic Reasoning},
+  author  = {Wu, Chenyang and Long, Fuchen and Huang, Binyuan and Sun, Xinlong
+             and Chen, Xi and Guo, Chun-Le and Li, Chongyi},
+  journal = {arXiv preprint arXiv:2608.26809},
+  year    = {2026}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  MMLVE-Agent &middot; Nankai University &amp; Tencent &middot;
+  <a href="https://huggingface.co/datasets/wcy1234567/MMLVE-Bench" target="_blank">MMLVE-Bench</a>
+</footer>
+
+<script>
+  // language toggle per sample
+  document.querySelectorAll('.lang-toggle').forEach(function(tg){
+    var sample = tg.closest('.sample');
+    tg.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var lang = btn.getAttribute('data-lang-btn');
+        tg.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        sample.querySelectorAll('[data-lang]').forEach(function(el){
+          el.style.display = (el.getAttribute('data-lang') === lang) ? '' : 'none';
+        });
+      });
+    });
+  });
+
+  // play on hover, pause on leave (in addition to native controls)
+  document.querySelectorAll('.vcell video').forEach(function(v){
+    v.addEventListener('mouseenter', function(){ v.play().catch(function(){}); });
+    v.addEventListener('mouseleave', function(){ v.pause(); });
+  });
+</script>
 </body>
 </html>
