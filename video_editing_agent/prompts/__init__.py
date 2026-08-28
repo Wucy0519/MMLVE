@@ -1,0 +1,22 @@
+"""LLM prompt templates for the video editing agent."""
+
+from video_editing_agent.prompts.templates import (
+    EVENT_GROUNDING_PROMPT,
+    INSTRUCTION_PARSE_PROMPT,
+    INSTRUCTION_REWRITE_PROMPT,
+    MASK_DETECTION_PROMPT,
+    QA_VALIDATION_PROMPT,
+    REF_IMAGE_PROMPT,
+    REF_IMAGE_QA_PROMPT,
+    INPAINT_PROMPT,
+)
+
+__all__ = [
+    "INSTRUCTION_REWRITE_PROMPT",
+    "INSTRUCTION_PARSE_PROMPT",
+    "EVENT_GROUNDING_PROMPT",
+    "MASK_DETECTION_PROMPT",
+    "QA_VALIDATION_PROMPT",
+    "REF_IMAGE_PROMPT",
+    "INPAINT_PROMPT",
+]
